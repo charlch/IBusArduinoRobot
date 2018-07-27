@@ -20,7 +20,6 @@ int armedState = DISARMED;
 
  
 void setup() {
-  // put your setup code here, to run once:
   Serial.begin(115200);
   IBus.begin(Serial);
   pinMode(ledPin, OUTPUT);
