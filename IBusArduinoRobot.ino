@@ -6,8 +6,11 @@ const int ledPin = LED_BUILTIN;
 const int THROTTLE_CHANNEL = 1;
 const int STEERING_CHANNEL = 0;
 const int ARM_CHANNEL = 4;
+const int REVERSE_CHANNEL = 5; //Set to -1 to not have reverse
 const int ARMED = 1;
 const int DISARMED = 0;
+const int FORWARD_GEAR = 0;
+const int REVERSE_GEAR = 1;
 const long RADIO_TIMEOUT = 500;
 
 HBridge left_motor(11, 10, DEAD_BAND_FRC);
@@ -17,6 +20,7 @@ int ledState = LOW;
 unsigned long previousMillis = 0;
 long interval = 1000; 
 int armedState = DISARMED;
+int gearDirection = FORWARD_GEAR;
 
  
 void setup() {
@@ -42,6 +46,15 @@ void loop() {
   {
     armedState=ARMED;
     interval = 1000;
+  }
+  if (REVERSE_CHANNEL > -1){
+    if (IBus.readChannel(REVERSE_CHANNEL) <1200){
+      gearDirection = FORWARD_GEAR;
+    }
+    else
+    {
+      gearDirection = REVERSE_GEAR;
+    }
   }
   
   updateLed();
@@ -99,6 +112,11 @@ void setControls(int throttle, int steering) {
    float left_signal = bound(_throttle+_steering);
    float right_signal = bound(_throttle-_steering);
 
+   if (gearDirection == REVERSE_GEAR) {
+     float t = left_signal;
+     left_signal = right_signal * -1.0;
+     right_signal = t * -1.0;
+   }
 
    Serial.print(left_signal);
    Serial.print(" ");
