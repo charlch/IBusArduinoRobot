@@ -1,7 +1,7 @@
 #include <HBridge.h>
 #include <FlySkyIBus.h>
 
-const float DEAD_BAND_FRC = 0.01;
+const float DEAD_BAND_FRC = 0.1;
 const int ledPin = LED_BUILTIN;
 const int THROTTLE_CHANNEL = 1;
 const int STEERING_CHANNEL = 0;
@@ -10,8 +10,8 @@ const int ARMED = 1;
 const int DISARMED = 0;
 const long RADIO_TIMEOUT = 500;
 
-HBridge left_motor(1, 2, DEAD_BAND_FRC);
-HBridge right_motor(3, 4, DEAD_BAND_FRC);
+HBridge left_motor(11, 10, DEAD_BAND_FRC);
+HBridge right_motor(5, 6, DEAD_BAND_FRC);
 
 int ledState = LOW;
 unsigned long previousMillis = 0;
@@ -54,6 +54,7 @@ void loop() {
     throttle = 1500;
     steering = 1500;
   }
+  
   setControls(throttle, steering);
 }
 
@@ -113,4 +114,3 @@ float bound(float signal) {
 float normalise(float signal) {
   return (signal-1500.0)/500.0;  
 }
-
