@@ -7,6 +7,7 @@ const int THROTTLE_CHANNEL = 1;
 const int STEERING_CHANNEL = 0;
 const int ARM_CHANNEL = 4;
 const int REVERSE_CHANNEL = 5; //Set to -1 to not have reverse
+const int MAX_SPEED_CHANNEL = 6;  //Set to -1 to disable 
 const int ARMED = 1;
 const int DISARMED = 0;
 const int FORWARD_GEAR = 0;
@@ -31,7 +32,7 @@ void setup() {
 
 void loop() {
   IBus.loop();
-  Serial.println(IBus.millisSinceUpdate());
+
   if (IBus.readChannel(ARM_CHANNEL) == 0 or IBus.millisSinceUpdate()>RADIO_TIMEOUT)
   {
     armedState=DISARMED;
@@ -108,6 +109,9 @@ void setControls(int throttle, int steering) {
    */
    float _throttle = normalise(throttle);
    float _steering = normalise(steering);
+   
+   // Expo
+   _steering = sign(_steering) * pow(abs(_steering), 2.0);
 
    float left_signal = bound(_throttle+_steering);
    float right_signal = bound(_throttle-_steering);
@@ -118,17 +122,25 @@ void setControls(int throttle, int steering) {
      right_signal = t * -1.0;
    }
 
-   Serial.print(left_signal);
-   Serial.print(" ");
-   Serial.println(right_signal);
+   if (MAX_SPEED_CHANNEL > -1){
+    float max_speed = map(IBus.readChannel(MAX_SPEED_CHANNEL), 1000.0, 2000.0, 1.0, 0.0);
+    left_signal *= max_speed;
+    right_signal *= max_speed;
+   
+   } 
+
    left_motor.set_signal(left_signal);
    right_motor.set_signal(right_signal);
 }
 
+float sign(float x){
+  return (x > 0.0) - (x < 0.0);
+}
+
 float bound(float signal) {
-  return min(max(signal, -1.0), 1.0);
+  return constrain(signal, -1.0, 1.0);
 }
 
 float normalise(float signal) {
-  return (signal-1500.0)/500.0;  
+  return map(signal, 1000.0, 2000.0, -1.0, 1.0);
 }
