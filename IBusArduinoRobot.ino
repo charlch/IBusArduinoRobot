@@ -124,7 +124,7 @@ void setControls(int throttle, int steering) {
     }
 
     if (MAX_SPEED_CHANNEL > -1) {
-        float max_speed = map(IBus.readChannel(MAX_SPEED_CHANNEL), 1000.0, 2000.0, 1.0, 0.0);
+        float max_speed = mapfloat(IBus.readChannel(MAX_SPEED_CHANNEL), 1000.0, 2000.0, 1.0, 0.0);
         left_signal *= max_speed;
         right_signal *= max_speed;
     }
@@ -142,5 +142,10 @@ float bound(float signal) {
 }
 
 float normalise(float signal) {
-    return map(signal, 1000.0, 2000.0, -1.0, 1.0);
+    return mapfloat(signal, 1000.0, 2000.0, -1.0, 1.0);
+}
+
+float mapfloat(float x, float in_min, float in_max, float out_min, float out_max)
+{
+    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
