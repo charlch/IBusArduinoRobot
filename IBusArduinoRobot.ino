@@ -26,8 +26,8 @@ const int FAST_LED = 100;
 
 // Pin setup
 const int ledPin = LED_BUILTIN;
-HBridge left_motor(11, 10, DEAD_BAND_FRC);
-HBridge right_motor(5, 6, DEAD_BAND_FRC);
+HBridge left_motor(11, 10);
+HBridge right_motor(5, 6);
 
 // Initial state
 int armedState = DISARMED;
@@ -41,6 +41,8 @@ void setup() {
     Serial.begin(115200);
     IBus.begin(Serial);
     pinMode(ledPin, OUTPUT);
+    left_motor.set_dead_band_fct(DEAD_BAND_FRC);
+    right_motor.set_dead_band_fct(DEAD_BAND_FRC);
 }
 
 void loop() {
